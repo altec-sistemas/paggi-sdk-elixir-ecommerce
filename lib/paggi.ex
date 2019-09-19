@@ -28,6 +28,7 @@ defmodule Paggi do
   """
   def get_partner_id() do
     with {:ok, [_env, {_field, token}]} <- Application.fetch_env(:paggi, Paggi) do
+      [%{"partner_id" => partner_id}] = JWT.peek_payload(Paggi.get_env(token)).fields["permissions"]
       partner_id
     end
   end
