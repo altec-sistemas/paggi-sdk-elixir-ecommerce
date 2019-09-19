@@ -18,7 +18,7 @@ defmodule Paggi.Macros.ResponseManagement do
       end
       defp adjust_value(value), do: value
 
-      def manage_response(%Paggi.Response{status_code: 200, body: body, resource: resource}) when is_binary(resource) do
+      def manage_response(%Paggi.Response{status_code: 200, body: body, resource: resource}) when is_binary(resource) and is_map(body) do
         body
         |> Poison.decode()
         |> case do
