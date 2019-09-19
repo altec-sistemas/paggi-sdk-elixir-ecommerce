@@ -76,10 +76,10 @@ defmodule Paggi.Macros.ResponseManagement do
             {:ok, struct}
 
           {:error, reason} ->
-            %Paggi.Error{
+            {:error, %Paggi.Error{
               code: 500,
               message: reason
-            }
+            }}
         end
       end
     end
