@@ -19,6 +19,7 @@ defmodule Paggi.MixProject do
 
   defp deps, do: [
     {:httpoison, "~> 1.5"},
-    {:poison, "~> 4.0"}
+    {:poison, "~> 4.0"},
+    {:jose, "~> 1.9"}
   ]
 end
