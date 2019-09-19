@@ -14,4 +14,10 @@ defmodule Paggi do
 
   Our documentation can be accessed by: https://developers.paggi.com/reference
   """
+  @doc """
+  Retrieve environment variables from configuration file
+  """
+  @spec get_env(binary | {:system, binary}) :: nil | binary
+  def get_env(var) when is_binary(var), do: var
+  def get_env({:system, var}) when is_binary(var), do: System.get_env(var)
 end
