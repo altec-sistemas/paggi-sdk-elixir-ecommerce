@@ -8,7 +8,7 @@ defmodule Paggi.Requester do
   alias HTTPoison.Request
 
   defp get_url(url) do
-    with {:ok, [environment: environment]} <- Application.fetch_env(:paggi, Paggi) do
+    with {:ok, [{_field, environment}, _token]} <- Application.fetch_env(:paggi, Paggi) do
       case Paggi.get_env(environment) do
         "staging" ->
           "https://api.stg.paggi.com#{url}"
@@ -20,7 +20,7 @@ defmodule Paggi.Requester do
   end
 
   defp get_headers(headers \\ []) do
-    with {:ok, [token: token]} <- Application.fetch_env(:paggi, Paggi) do
+    with {:ok, [_env, {_field, token}]} <- Application.fetch_env(:paggi, Paggi) do
       headers ++ [
           {"Authorization", "Bearer #{Paggi.get_env(token)}"},
           {"Accept", "application/json"},
@@ -61,7 +61,7 @@ defmodule Paggi.Requester do
   def make_request(method, [resource], id \\ nil, body \\ nil, uri \\ nil) when is_atom(method) and is_binary(resource) do
     uri =
       cond do
-        not is_nil(id) and not is_nil(uri) -> "/partners/#{Paggi.get_partner_id()}/#{resource}/#{id}/#{uri}"
+        not is_nil(id) and not is_nil(uri) -> "/partners/#{Paggi.get_partner_id()}/#{resource}/#{id}#{uri}"
         not is_nil(id) -> "/partners/#{Paggi.get_partner_id()}/#{resource}/#{id}"
         true -> "/partners/#{Paggi.get_partner_id()}/#{resource}"
       end
