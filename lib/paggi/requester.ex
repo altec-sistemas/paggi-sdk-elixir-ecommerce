@@ -8,19 +8,19 @@ defmodule Paggi.Requester do
   alias HTTPoison.Request
 
   defp get_url(url) do
-    with {:ok, [{_field, environment}, _token]} <- Application.fetch_env(:paggi, Paggi) do
+    with {:ok, [{_field, environment}, _token, {_version, version}]} <- Application.fetch_env(:paggi, Paggi) do
       case Paggi.get_env(environment) do
         "staging" ->
-          "https://api.stg.paggi.com#{url}"
+          "https://api.stg.paggi.com/#{Paggi.get_env(version)}#{url}"
 
         "production" ->
-          "https://api.paggi.com#{url}"
+          "https://api.paggi.com/#{Paggi.get_env(version)}#{url}"
       end
     end
   end
 
   defp get_headers(headers \\ []) do
-    with {:ok, [_env, {_field, token}]} <- Application.fetch_env(:paggi, Paggi) do
+    with {:ok, [_env, {_field, token}, _version]} <- Application.fetch_env(:paggi, Paggi) do
       headers ++ [
           {"Authorization", "Bearer #{Paggi.get_env(token)}"},
           {"Accept", "application/json"},
