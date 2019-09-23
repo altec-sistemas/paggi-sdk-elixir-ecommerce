@@ -61,6 +61,8 @@ defmodule Paggi.Requester do
   def make_request(method, [resource], id \\ nil, body \\ nil, uri \\ nil) when is_atom(method) and is_binary(resource) do
     uri =
       cond do
+        resource == "banks" and not is_nil(id) -> "/#{resource}/#{id}"
+        resource == "banks" and is_nil(id) -> "/#{resource}"
         not is_nil(id) and not is_nil(uri) -> "/partners/#{Paggi.get_partner_id()}/#{resource}/#{id}#{uri}"
         not is_nil(id) -> "/partners/#{Paggi.get_partner_id()}/#{resource}/#{id}"
         true -> "/partners/#{Paggi.get_partner_id()}/#{resource}"
