@@ -43,8 +43,17 @@ defmodule Paggi.Requester do
         |> Map.put(:body, %{})
 
       %{body: body} = response ->
-        response
-        |> Map.put(:body, Poison.decode!(body))
+        Logger.debug("[#{__MODULE__}] Response with body: #{inspect(body)}")
+
+        case Poison.decode(body) do
+          {:ok, body} ->
+            response
+            |> Map.put(:body, body)
+
+          _ ->
+            response
+          |> Map.put(:body, %{"message" => body})
+        end
     end
   end
   defp get_response({:error, %{reason: reason}}, resource) do
