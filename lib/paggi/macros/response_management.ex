@@ -19,10 +19,8 @@ defmodule Paggi.Macros.ResponseManagement do
       defp adjust_value(value), do: value
 
       def manage_response(%Paggi.Response{status_code: 200, body: body, resource: resource}) when is_binary(resource) and is_map(body) do
-        body
-        |> Poison.decode()
-        |> case do
-          {:ok, %{"entries" => entries} = body} ->
+        case body do
+          %{"entries" => entries} = body ->
             entry_struct =
               @namespace
               |> Module.safe_concat(String.capitalize(resource))
@@ -55,7 +53,7 @@ defmodule Paggi.Macros.ResponseManagement do
 
             {:ok, body}
 
-          {:ok, body} ->
+          body ->
             struct =
               @namespace
               |> Module.safe_concat(String.capitalize(resource))
@@ -74,44 +72,27 @@ defmodule Paggi.Macros.ResponseManagement do
               end)
 
             {:ok, struct}
-
-          {:error, reason} ->
-            {:error, %Paggi.Error{
-              code: 500,
-              message: reason
-            }}
         end
       end
-      def manage_response(%Paggi.Response{status_code: 201, body: body, resource: resource}) when is_binary(resource) and is_map(body) do
-        body
-        |> Poison.decode()
-        |> case do
-          {:ok, body} ->
-            struct =
-              @namespace
-              |> Module.safe_concat(String.capitalize(resource))
-              |> struct()
+      def manage_response(%Paggi.Response{status_code: 201, body: body, resource: resource}) when is_binary(resource) and is_binary(body) do
+        struct =
+          @namespace
+          |> Module.safe_concat(String.capitalize(resource))
+          |> struct()
 
-            struct =
-              body
-              |> Enum.reduce(struct, fn {key, value}, struct ->
-                key = String.to_atom(key)
+        struct =
+          body
+          |> Enum.reduce(struct, fn {key, value}, struct ->
+            key = String.to_atom(key)
 
-                if Map.has_key?(struct, key) do
-                  Map.put(struct, key, adjust_value(value))
-                else
-                  struct
-                end
-              end)
+            if Map.has_key?(struct, key) do
+              Map.put(struct, key, adjust_value(value))
+            else
+              struct
+            end
+          end)
 
-            {:ok, struct}
-
-          {:error, reason} ->
-            {:error, %Paggi.Error{
-              code: 500,
-              message: reason
-            }}
-        end
+        {:ok, struct}
       end
       def manage_response(%Paggi.Response{status_code: 204} = response), do: {:ok, response}
       def manage_response(%Paggi.Response{status_code: 400}), do: {:error, %Paggi.Error{code: 400, message: "Algum parâmetro ou cabeçalho HTTP está ausente"}}
