@@ -66,6 +66,29 @@ defmodule Paggi.Requester do
         true -> "/partners/#{Paggi.get_partner_id()}/#{resource}"
       end
 
+    {uri, body} =
+      case method do
+        :get ->
+          if is_nil(body) do
+            {uri, nil}
+          else
+            uri =
+              body
+              |> Enum.reduce(uri, fn {key, value}, uri ->
+                if String.contains?(uri, "?") do
+                  "#{uri}&#{key}=#{value}"
+                else
+                  "#{uri}?#{key}=#{value}"
+                end
+              end)
+
+            {uri, nil}
+          end
+
+        _ ->
+          {uri, body}
+      end
+
     case body do
       nil ->
         %Request{
