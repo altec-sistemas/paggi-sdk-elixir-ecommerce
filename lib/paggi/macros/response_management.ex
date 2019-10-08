@@ -16,7 +16,61 @@ defmodule Paggi.Macros.ResponseManagement do
           Map.put(map, String.to_atom(key), adjust_value(value))
         end)
       end
+      defp adjust_value(struct, value) when is_map(struct) and is_map(value) do
+        value
+        |> Enum.reduce(struct, fn {key, value}, map ->
+          Map.put(map, String.to_atom(key), adjust_value(value))
+        end)
+      end
+      defp adjust_value(struct, value) when is_map(struct) and is_list(value) do
+        value
+        |> IO.inspect()
+        |> Enum.reduce_while({:ok, []}, fn item, {:ok, items} ->
+          item
+          |> Enum.reduce(struct, fn {key, value}, map ->
+            if is_list(value) do
+              struct_new =
+                struct
+                |> Map.get(:__struct__)
+                |> Module.safe_concat(String.capitalize(key))
+                |> struct()
+
+              Map.put(map, String.to_atom(key), adjust_value(struct_new, value))
+            else
+              Map.put(map, String.to_atom(key), adjust_value(value))
+            end
+          end)
+          |> case do
+            item when is_map(item) ->
+              {:cont, {:ok, items ++ [item]}}
+
+            _ ->
+              {:halt, {:error, :bad_request}}
+          end
+        end)
+        |> case do
+          {:ok, items} ->
+            items
+
+          _ ->
+            value
+        end
+      end
       defp adjust_value(value), do: value
+
+      defp field_has_struct?(field_name, resource) when is_atom(field_name) and is_binary(resource) do
+        try do
+          @namespace
+          |> Module.safe_concat(String.capitalize(resource))
+          |> Module.safe_concat(String.capitalize(Atom.to_string(field_name)))
+          |> struct()
+
+          true
+        rescue
+          _ ->
+            false
+        end
+      end
 
       def manage_response(%Paggi.Response{status_code: 200, body: body, resource: resource}) when is_binary(resource) and is_map(body) do
         case body do
@@ -34,10 +88,25 @@ defmodule Paggi.Macros.ResponseManagement do
                   |> Enum.reduce(entry_struct, fn {key, value}, struct ->
                     key = String.to_atom(key)
 
-                    if Map.has_key?(struct, key) do
-                      Map.put(struct, key, adjust_value(value))
+                    if field_has_struct?(key, resource) and is_map(value) do
+                      if Map.has_key?(struct, key) do
+                        struct_new =
+                          @namespace
+                          |> Module.safe_concat(String.capitalize(resource))
+                          |> Module.safe_concat(String.capitalize(Atom.to_string(key)))
+                          |> struct()
+
+                        struct_new = adjust_value(value)
+                        Map.put(struct, key, struct_new)
+                      else
+                        struct
+                      end
                     else
-                      struct
+                      if Map.has_key?(struct, key) do
+                        Map.put(struct, key, adjust_value(value))
+                      else
+                        struct
+                      end
                     end
                   end)
                 structs ++ [entry]
@@ -64,17 +133,37 @@ defmodule Paggi.Macros.ResponseManagement do
               |> Enum.reduce(struct, fn {key, value}, struct ->
                 key = String.to_atom(key)
 
-                if Map.has_key?(struct, key) do
-                  Map.put(struct, key, adjust_value(value))
-                else
-                  struct
+                cond do
+                  field_has_struct?(key, resource) and is_map(value) ->
+                    struct_new =
+                      @namespace
+                      |> Module.safe_concat(String.capitalize(resource))
+                      |> Module.safe_concat(String.capitalize(Atom.to_string(key)))
+                      |> struct()
+
+                    Map.put(struct, key, adjust_value(struct_new, value))
+
+                  field_has_struct?(key, resource) and is_list(value) ->
+                    struct_new =
+                      @namespace
+                      |> Module.safe_concat(String.capitalize(resource))
+                      |> Module.safe_concat(String.capitalize(Atom.to_string(key)))
+                      |> struct()
+
+                    Map.put(struct, key, adjust_value(struct_new, value))
+                  true ->
+                    if Map.has_key?(struct, key) do
+                      Map.put(struct, key, adjust_value(value))
+                    else
+                      struct
+                    end
                 end
               end)
 
             {:ok, struct}
         end
       end
-      def manage_response(%Paggi.Response{status_code: 201, body: body, resource: resource}) when is_binary(resource) and is_binary(body) do
+      def manage_response(%Paggi.Response{status_code: 201, body: body, resource: resource}) when is_binary(resource) and is_map(body) do
         struct =
           @namespace
           |> Module.safe_concat(String.capitalize(resource))
