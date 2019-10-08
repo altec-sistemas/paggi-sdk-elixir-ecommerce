@@ -30,3 +30,49 @@ defmodule Paggi.Structs.Subscriptions.Discounts do
     :description
   ]
 end
+
+defmodule Paggi.Structs.Subscriptions.Charges do
+  defstruct [
+    :id,
+    :amount,
+    :card_id,
+    :installments,
+    :statuses
+  ]
+end
+
+defmodule Paggi.Structs.Subscriptions.CurrentCharge do
+  defstruct [
+    :id,
+    :amount,
+    :card_id,
+    :installments,
+    :statuses
+  ]
+end
+
+defmodule Paggi.Structs.Subscriptions.Customer do
+  defstruct [
+    :document,
+    :email,
+    :name
+  ]
+end
+
+defmodule Paggi.Structs.Subscriptions.Charges.Statuses do
+  defstruct [
+    :amount,
+    :inserted_at,
+    :reason,
+    :type
+  ]
+end
+
+defmodule Paggi.Structs.Subscriptions.CurrentCharge.Statuses do
+  defstruct [
+    :amount,
+    :inserted_at,
+    :reason,
+    :type
+  ]
+end
