@@ -101,6 +101,7 @@ alias Paggi.Resources.Recipients
 alias Paggi.Resources.Banks
 {:ok, banks} = Banks.retrieve_all %{"start" => 0, "count" => 20}
 ```
+
 ### Planos
 
 ```elixir
@@ -112,6 +113,54 @@ alias Paggi.Resources.Plans
   "trial_period" => "2d",
   "external_identifier" => "12345",
   "description"=> "Teste"
+}
+```
+
+### Assinaturas
+
+```elixir
+alias Paggi.Resources.{Subscriptions, Plans}
+
+{:ok, plan} = Plans.create %{
+  "name" => "Meu primeiro plano",
+  "price" => 1990,
+  "interval" => "1m",
+  "trial_period" => "2d",
+  "external_identifier" => "12345",
+  "description"=> "Teste"
+}
+
+{:ok, subscription} = Subscriptions.create %{
+  "external_identifier" => "Seu ID de assinatura",
+   "plan_id" => plan["id"],
+   "ip" => "8.8.8.8",
+   "customer" => %{
+      "name" => "Bruce Wayne",
+      "document" => "86219425006",
+      "email" => "bruce@waynecorp.com"
+   },
+   "card" => %{
+      "cvc" => "123",
+      "year" => "2020",
+      "month" => "01",
+      "number" => "4485200700046446",
+      "holder" => "BRUCE WAYNER",
+      "document" => "16223541090"
+   },
+   "discount" => [
+      %{
+         "period" => 2,
+         "description" => "Teste de discount",
+         "amount" => 2000
+      }
+   ],
+   "additional" => [
+      %{
+         "period" => 3,
+         "description" => "Teste de additional",
+         "amount" => 1999
+      }
+   ]
 }
 ```
 
