@@ -8,7 +8,7 @@ defmodule Paggi.Macros.Find do
   """
   defmacro __using__(_opts) do
     quote do
-      def get(id) when is_binary(id) do
+      def retrieve_one(id) when is_binary(id) do
         Paggi.Requester.make_request(:get, @resource, id)
         |> manage_response()
       end
