@@ -3,5 +3,5 @@ defmodule Paggi.Resources.Orders do
   Paggi's Orders resource
   """
   use Paggi.Resource
-  use Paggi.Macros.{Cancel, Capture, Create}
+  use Paggi.Macros.{Find, Cancel, Capture, Create}
 end
