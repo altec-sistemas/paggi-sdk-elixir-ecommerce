@@ -5,7 +5,7 @@ Utilize este SDK para realizar a integração com nossa API de ecommerce.
 ## Instalação
 
 ```elixir
-{:paggi, git: "altec-sistemas/paggi-sdk-elixir-ecommerce"}
+{:paggi, git: "altec-sistemas/paggi-sdk-elixir-ecommerce", tag: "v1.0.0"}
 ```
 
 ## Utilização
