@@ -209,6 +209,7 @@ defmodule Paggi.Macros.ResponseManagement do
       def manage_response(%Paggi.Response{status_code: 503}), do: {:error, %Paggi.Error{code: 503, message: "Ocorreu um erro na infraestrutura Paggi"}}
       def manage_response(%Paggi.Response{status_code: 504, body: %{"message" => message}}), do: {:error, %Paggi.Error{code: 504, message: message}}
       def manage_response(%Paggi.Response{status_code: 504}), do: {:error, %Paggi.Error{code: 504, message: "Ocorreu um erro ao tentar processar sua solicitação. Verifique se os campos enviados estão corretos"}}
+      def manage_response(%Paggi.Response{status_code: status_code}), do: {:error, %Paggi.Error{code: status_code, message: "Something goes wrong"}}
     end
   end
 end
