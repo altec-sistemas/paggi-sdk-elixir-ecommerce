@@ -1,4 +1,4 @@
-# Paggi Elixir SDK - Ecommerce
+# Paggi Elixir SDK - Ecommerce [![Build Status](https://drone.altec.ai/api/badges/altec-sistemas/paggi-sdk-elixir-ecommerce/status.svg)](https://drone.altec.ai/altec-sistemas/paggi-sdk-elixir-ecommerce)
 
 Utilize este SDK para realizar a integração com nossa API de ecommerce.
 
