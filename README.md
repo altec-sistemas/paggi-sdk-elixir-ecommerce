@@ -8,8 +8,6 @@ Utilize este SDK para realizar a integração com nossa API de ecommerce.
 {:paggi, git: "altec-sistemas/paggi-sdk-elixir-ecommerce", tag: "v1.0.2"}
 ```
 
-## Utilização
-
 ### Configuração
 
 Você pode utilizar as variáveis de ambiente ou definir diretamente no arquivo de configuração
@@ -25,10 +23,15 @@ config :paggi, Paggi,
   version: {:system, "PAGGI_VERSION"} # "v1"
 ```
 
+## Utilização
+
 ### Cartões:
 
 ```elixir
 alias Paggi.Resources.Cards
+
+> Criar cartão:
+
 {:ok, card} = Cards.create %{
   "cvc" => "123",
   "year" => "2022",
@@ -37,12 +40,28 @@ alias Paggi.Resources.Cards
   "holder" => "BRUCE WAYNER",
   "document" => "16123541090"
 }
+
+> Consultar cartões por cliente:
+
+{:ok, cards} = Cards.find %{
+  "document" => "16123541090"
+}
+
+
+> Deletar cartão:
+
+{:ok, card} = Cards.delete %{
+  "card_id" => "7f42a0a0-6ae8-4a57-a340-a8c4867771eb"
+}
 ```
 
 ### Pedidos
 
 ```elixir
 alias Paggi.Resources.Orders
+
+> Criar pagamento:
+
 {:ok, order} = Orders.create %{
   "external_identifier" => "ABC123",
   "ip" => "8.8.8.8",
@@ -66,6 +85,13 @@ alias Paggi.Resources.Orders
       "email" => "bruce@waynecorp.com"
   }
 }
+
+> Cancelar pagamento:
+
+order_id = "ffe22540-ebf2-4415-92af-56b2cf80bf9e"
+
+{:ok, order} =  Orders.cancel(order_id)
+
 ```
 
 ### Recebedores
@@ -93,34 +119,46 @@ alias Paggi.Resources.Recipients
     "account_type" => "CONTA_CORRENTE"
   }
 }
+
+> Buscar recebedor:
+
+{:ok, recipient} = Recipients.find()
+
+
+> Atualizar recebedor:
+
+{:ok, recipient} = Recipients.update %{
+  "name" => "BRUCE WAYNER",
+  "document" => "78945612389",
+  "bank_account" => %{
+    "bank_code" => "077",
+    "branch_number" => "0123",
+    "branch_digit" => "4",
+    "account_number" => "330233",
+    "account_digit" => "7",
+    "account_holder_name" => "BRUCE WAYNER",
+    "account_type" => "CONTA_CORRENTE"
+  }
+}
+
 ```
 
 ### Bancos
 
 ```elixir
 alias Paggi.Resources.Banks
+
 {:ok, banks} = Banks.retrieve_all %{"start" => 0, "count" => 20}
 ```
 
-### Planos
 
-```elixir
-alias Paggi.Resources.Plans
-{:ok, plan} = Plans.create %{
-  "name" => "Meu primeiro plano",
-  "price" => 1990,
-  "interval" => "1m",
-  "trial_period" => "2d",
-  "external_identifier" => "12345",
-  "description"=> "Teste"
-}
-```
-
-### Assinaturas
+### Planos / Assinaturas
 
 ```elixir
 alias Paggi.Resources.{Subscriptions, Plans}
 
+> Criar plano:
+
 {:ok, plan} = Plans.create %{
   "name" => "Meu primeiro plano",
   "price" => 1990,
@@ -129,6 +167,8 @@ alias Paggi.Resources.{Subscriptions, Plans}
   "external_identifier" => "12345",
   "description"=> "Teste"
 }
+
+> Criar assinatura:
 
 {:ok, subscription} = Subscriptions.create %{
   "external_identifier" => "Seu ID de assinatura",
@@ -161,6 +201,28 @@ alias Paggi.Resources.{Subscriptions, Plans}
          "amount" => 1999
       }
    ]
+}
+
+
+> Consultar plano:
+
+{:ok, plan} = Plan.find %{
+   "plan_id" => "7f42a0a0-6ae8-4a57-a340-a8c4867771eb"
+}
+
+
+> Atualizar plano: 
+
+{:ok, plan} = Plan.update %{
+   "plan_id" => "7f42a0a0-6ae8-4a57-a340-a8c4867771eb",
+   "price" => 2990
+}
+
+
+> Cancelar assinatura:
+
+{:ok, subscription} = Subscriptions.delete %{
+  "subscription_id" => "cae4fd53-2169-4b5f-ac48-026fade071ae"
 }
 ```
 
