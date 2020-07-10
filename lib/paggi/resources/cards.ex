@@ -3,5 +3,5 @@ defmodule Paggi.Resources.Cards do
   Paggi's Cards resource
   """
   use Paggi.Resource
-  use Paggi.Macros.{Create, Delete}
+  use Paggi.Macros.{Create, Delete, Find}
 end
