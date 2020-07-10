@@ -154,6 +154,10 @@ alias Paggi.Resources.Banks
 
 ### Planos / Assinaturas
 
+Para criar uma assinatura é necessário um plano existente.
+O Plano controla o valor, intervalo entre pagamentos, duração, período de teste da assinatura.
+A Assinatura é responsável pelo pagamento, assim como desconto e preços adicionais se necessário.
+
 ```elixir
 alias Paggi.Resources.{Subscriptions, Plans}
 
